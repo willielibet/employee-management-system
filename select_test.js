@@ -1,5 +1,4 @@
-var connection = require('./employeesDBConnection')
-
+let connection = require('./employeesDBConnection')
 
 const afterConnection = () => {
     connection.query('SELECT * FROM department', (err, res) => {
