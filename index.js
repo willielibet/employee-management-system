@@ -2,7 +2,8 @@ let connection = require('./employeesDBConnection')
 // const mysql = require('mysql');
 const inquirer = require('inquirer');
 
-function databaseAction() {
+//prompt the user for any of the possible actions they should take.
+const databaseAction = () => {
     inquirer.prompt([
         {
           type: "list",
@@ -14,7 +15,9 @@ function databaseAction() {
                     "Add Employee", 
                     "Add Department",    
                     "Add Role", 
-                    "Update Employee Role"],
+                    "Update Employee Role",
+                    "Exit",
+            ],
         },
       ])
       .then((dbSelection) => {
@@ -41,7 +44,7 @@ function databaseAction() {
             updateEmployeeRole();
             break;
           default:
-            connection.end()
+            endConnection();
             break;
         }
       });
@@ -52,10 +55,16 @@ function databaseAction() {
       if (err) throw err;
       console.log(res);
       //connection.end();
+      (err) => {
+        if (err) throw err;
+        console.log('Your task was successfull!');
+        // re-prompt the user for if they want to query the database any further
+        databaseAction();
+      }
     });
   };
 
-  databaseAction()
+//   databaseAction()
 //   viewAllEmployees();
 
   //connect to the mysql server and sql database
@@ -64,3 +73,14 @@ function databaseAction() {
 //     start()
 //   })
 // connection.end();
+
+//connect to the mysql server and sql database
+connection.connect((err) => {
+    if (err) throw err;
+    //run the start function after the connection is made to prompt the user
+    databaseAction();
+  });
+
+  const endConnection = () => {
+    connection.end();
+  }
