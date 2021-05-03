@@ -25,8 +25,8 @@ const databaseAction = () => {
           case "View All Employees":
             viewAllEmployees();
             break;
-          case "View All Employees by Department":
-            viewAllEmployeesByDept();
+          case "View All Employees by Manager":
+            viewAllEmployeesByManager();
             break;
             case "View All Employees by Role":
             viewAllEmployeesByRole();
@@ -51,18 +51,36 @@ const databaseAction = () => {
   }
 
   const viewAllEmployees = () => {
-    connection.query('SELECT * FROM department', (err, res) => {
-      if (err) throw err;
-      console.log(res);
-      //connection.end();
-      (err) => {
+    let sql = `SELECT e.id, e.first_name, e.Last_name, r.title, d.name as "Department", salary, 
+    CONCAT (m.first_name," ", m.last_name) AS "Manager" 
+    FROM employee e INNER JOIN employee m ON e.manager_id = m.id 
+    LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d on r.department_id = d.id`
+        connection.query(sql, (err, res) => {
         if (err) throw err;
-        console.log('Your task was successfull!');
-        // re-prompt the user for if they want to query the database any further
+        console.table(res);
+        // console.log(res);
+        //connection.end();
         databaseAction();
-      }
-    });
+      });
+      
   };
+
+ 
+
+
+//   const viewAllEmployees = () => {
+//     connection.query('SELECT * FROM department', (err, res) => {
+//       if (err) throw err;
+//       console.log(res);
+//       //connection.end();
+//       (err) => {
+//         if (err) throw err;
+//         console.log('Your task was successfull!');
+//         // re-prompt the user for if they want to query the database any further
+//         databaseAction();
+//       }
+//     });
+//   };
 
 //   databaseAction()
 //   viewAllEmployees();
