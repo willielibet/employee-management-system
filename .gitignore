@@ -1,3 +1,4 @@
 employeesDBConnection.js
 node_modules
 db_schemas_copy.sql
+.env
