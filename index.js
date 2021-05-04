@@ -12,7 +12,8 @@ const databaseAction = () => {
           message: "What would you like to do?",
           choices: ["View All Employees", 
                     "View All Employees by Department", 
-                    "View All Employees by Role", 
+                    "View All Employees by Role",
+                    "View All Departments", 
                     "Add Employee", 
                     "Add Department",    
                     "Add Role", 
@@ -23,29 +24,32 @@ const databaseAction = () => {
       ])
       .then((dbSelection) => {
         switch (dbSelection.dbAction) {
-          case "View All Employees":
-            viewAllEmployees();
+            case "View All Employees":
+                viewAllEmployees();
             break;
-          case "View All Employees by Manager":
-            viewAllEmployeesByManager();
+            case "View All Employees by Manager":
+                viewAllEmployeesByManager();
             break;
             case "View All Employees by Role":
-            viewAllEmployeesByRole();
+                viewAllEmployeesByRole();
             break;
+            case "View All Departments":
+                viewAllDepartments();
+            break
             case "Add Employee":
-            addEmployee();
+                addEmployee();
             break;
             case "Add Department":
-            addDepartment();
+                addDepartment();
             break;
             case "Add Role":
-            addRole();
+                addRole();
             break;
             case "Update Employee Role":
-            updateEmployeeRole();
+                updateEmployeeRole();
             break;
-          default:
-            endConnection();
+            default:
+                endConnection();
             break;
         }
       });
@@ -103,6 +107,28 @@ const databaseAction = () => {
 //     start()
 //   })
 // connection.end();
+
+
+const viewAllDepartments = () => {
+    let sql = `SELECT d.id, d.name "Department Name"
+                FROM department d;`
+
+    // let sql = `SELECT e.id, e.first_name, e.Last_name, r.title, d.name as "Department", salary
+    // FROM employee e
+    // LEFT JOIN role r 
+    // ON e.role_id = r.id 
+    // LEFT JOIN department d 
+    // ON r.department_id = d.id`
+        connection.query(sql, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        // console.log(res);
+        //connection.end();
+        databaseAction();
+      });
+  };
+
+
 
 const addDepartment = () => {
         inquirer.prompt([
