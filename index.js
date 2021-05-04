@@ -1,6 +1,7 @@
 let connection = require('./employeesDBConnection')
 // const mysql = require('mysql');
 const inquirer = require('inquirer');
+const { add } = require('lodash');
 
 //prompt the user for any of the possible actions they should take.
 const databaseAction = () => {
@@ -113,24 +114,59 @@ const addDepartment = () => {
         ])
         .then((answer) => {
             connection.query(
-        // let sql = "INSERT INTO department SET ?"
             'INSERT INTO department SET ?',
             {
                 name: answer.department,
             },
             (err, res) => {
                 if (err) throw err;
-                // console.table(res);
                 console.log(`${res.affectedRows} product inserted!\n`);
                 console.log("New department created successfully!");
-
-                // databaseAction();
-                // `SELECT * FROM department;`
                 databaseAction();
             }
         );
       });
 }
+
+
+const addRole = () => {
+    inquirer.prompt([
+        {
+            name: "title",
+            type: "input",
+            message: "What is the name of the role? "
+        },
+        {
+            name: "salary",
+            type: "input",
+            message: "What is the salary of the role? "
+        },
+        {
+            name: "department_id",
+            type: "input",
+            message: "Enter the department ID the role belongs to [Sales = 1, Engineering = 2, Finance = 3, Legal = 4]: ",
+            // addDepartment()
+        },
+    ])
+    .then((answer) => {
+        connection.query(
+        'INSERT INTO role SET ?', 
+        {
+            title: answer.title,
+            salary: answer.salary,
+            department_id: answer.department_id,
+        },
+        (err, res) => {
+            if (err) throw err;
+            console.log(`${res.affectedRows} product inserted!\n`);
+            console.log("New department created successfully!");
+           databaseAction();
+        }
+    );
+  });
+}
+//   });
+
 
 //connect to the mysql server and sql database
 connection.connect((err) => {
