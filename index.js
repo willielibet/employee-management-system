@@ -51,10 +51,22 @@ const databaseAction = () => {
   }
 
   const viewAllEmployees = () => {
-    let sql = `SELECT e.id, e.first_name, e.Last_name, r.title, d.name as "Department", salary, 
-    CONCAT (m.first_name," ", m.last_name) AS "Manager" 
-    FROM employee e INNER JOIN employee m ON e.manager_id = m.id 
-    LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d on r.department_id = d.id`
+    let sql = `SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department,
+                        r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
+                FROM employee e
+                LEFT JOIN employee AS m 
+                ON m.id = e.manager_id
+                LEFT JOIN role r 
+                ON e.role_id = r.id
+                LEFT JOIN department d 
+                ON r.department_id = d.id;`
+
+    // let sql = `SELECT e.id, e.first_name, e.Last_name, r.title, d.name as "Department", salary
+    // FROM employee e
+    // LEFT JOIN role r 
+    // ON e.role_id = r.id 
+    // LEFT JOIN department d 
+    // ON r.department_id = d.id`
         connection.query(sql, (err, res) => {
         if (err) throw err;
         console.table(res);
@@ -62,7 +74,6 @@ const databaseAction = () => {
         //connection.end();
         databaseAction();
       });
-      
   };
 
  
@@ -91,6 +102,35 @@ const databaseAction = () => {
 //     start()
 //   })
 // connection.end();
+
+const addDepartment = () => {
+        inquirer.prompt([
+            {
+                name: "department",
+                type: "input",
+                message: "Please enter the name of the new department that you would like to add: "
+            }
+        ])
+        .then((answer) => {
+            connection.query(
+        // let sql = "INSERT INTO department SET ?"
+            'INSERT INTO department SET ?',
+            {
+                name: answer.department,
+            },
+            (err, res) => {
+                if (err) throw err;
+                // console.table(res);
+                console.log(`${res.affectedRows} product inserted!\n`);
+                console.log("New department created successfully!");
+
+                // databaseAction();
+                // `SELECT * FROM department;`
+                databaseAction();
+            }
+        );
+      });
+}
 
 //connect to the mysql server and sql database
 connection.connect((err) => {

@@ -1,25 +1,27 @@
 USE employeesdb;
 
-INSERT INTO department(name) VALUES ('Management');
-INSERT INTO department(name) VALUES ('Network');
-INSERT INTO department(name) VALUES('DevOps');
-INSERT INTO department(name) VALUES('Human Resources');
-INSERT INTO department(name) VALUES('Director');
+INSERT INTO department(name) VALUES ('Sales');
+INSERT INTO department(name) VALUES ('Engineering');
 INSERT INTO department(name) VALUES('Finance');
+INSERT INTO department(name) VALUES('Legal');
 
-INSERT INTO role(title, salary, department_id) VALUES ('IT Project Manager', 123000, 2);
-INSERT INTO role(title, salary, department_id) VALUES ('Network Manager', 75300, 3);
-INSERT INTO role(title, salary, department_id) VALUES('HR Manager', 55000, 1);
-INSERT INTO role(title, salary, department_id) VALUES('Linux Administrator', 50000, 3);
-INSERT INTO role(title, salary, department_id) VALUES('JavaScript Developer', 87000, 2);
-INSERT INTO role(title, salary, department_id) VALUES('Database Administrator', 65000, 2);
-INSERT INTO role(title, salary, department_id) VALUES('Systems Administraor', 74000, 3);
-INSERT INTO role(title, salary, department_id) VALUES('HR Specialist', 34000, 1);
-INSERT INTO role(title, salary, department_id) VALUES('Accountant', 88000, 4);
 
-INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES ("Michael2", "First2", 1, NULL);
-INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Miss', 'Spaces', 2, NULL);
-INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Howard', 'Johnson', 3, NULL);
-INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Tony', 'Debug', 4, 1);
-INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Hudson', 'River', 5, 2);
-INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Darryl', 'Straw', 6, 3);
+INSERT INTO role(title, salary, department_id) VALUES ('Sales Lead', 100000, 1);
+INSERT INTO role(title, salary, department_id) VALUES ('Salesperson', 80000, 1);
+INSERT INTO role(title, salary, department_id) VALUES('Lead Engineer', 15000, 2);
+INSERT INTO role(title, salary, department_id) VALUES('Software Engineer', 120000, 2);
+INSERT INTO role(title, salary, department_id) VALUES('Account Manager', 160000, 3);
+INSERT INTO role(title, salary, department_id) VALUES('Accountant', 125000, 3);
+INSERT INTO role(title, salary, department_id) VALUES('Legal Team Lead', 250000, 4);
+INSERT INTO role(title, salary, department_id) VALUES('Lawyer', 190000, 4);
+
+
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES ("John", "Doe", 1, NULL);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Mike', 'Chan', 2, 1);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Ashley', 'Rodriguez', 3, NULL);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Kevin', 'Tupik', 4, 3);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Kunal', 'Singh', 5, NULL);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Malia', 'Brown', 6, 5);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Sarah', 'Lourd', 5, NULL);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Tom', 'Allen', 8, 7);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Jackie', 'Chan', 1, NULL);
