@@ -1,7 +1,6 @@
 let connection = require('./employeesDBConnection')
 // const mysql = require('mysql');
 const inquirer = require('inquirer');
-const { add } = require('lodash');
 
 //prompt the user for any of the possible actions they should take.
 const databaseAction = () => {
@@ -13,7 +12,9 @@ const databaseAction = () => {
           choices: ["View All Employees", 
                     "View All Employees by Department", 
                     "View All Employees by Role",
+                    "View All Employees by Manager",
                     "View All Departments", 
+                    "View All Roles",
                     "Add Employee", 
                     "Add Department",    
                     "Add Role", 
@@ -30,12 +31,18 @@ const databaseAction = () => {
             case "View All Employees by Manager":
                 viewAllEmployeesByManager();
             break;
+            case "View All Employees by Department":
+                viewAllEmployeesByDepartment();
+            break;
             case "View All Employees by Role":
                 viewAllEmployeesByRole();
             break;
             case "View All Departments":
                 viewAllDepartments();
-            break
+            break;
+            case "View All Roles":
+                viewAllRoles();
+            break;
             case "Add Employee":
                 addEmployee();
             break;
@@ -65,65 +72,74 @@ const databaseAction = () => {
                 ON e.role_id = r.id
                 LEFT JOIN department d 
                 ON r.department_id = d.id;`
-
-    // let sql = `SELECT e.id, e.first_name, e.Last_name, r.title, d.name as "Department", salary
-    // FROM employee e
-    // LEFT JOIN role r 
-    // ON e.role_id = r.id 
-    // LEFT JOIN department d 
-    // ON r.department_id = d.id`
         connection.query(sql, (err, res) => {
         if (err) throw err;
         console.table(res);
-        // console.log(res);
-        //connection.end();
         databaseAction();
       });
   };
 
- 
-
-
-//   const viewAllEmployees = () => {
-//     connection.query('SELECT * FROM department', (err, res) => {
-//       if (err) throw err;
-//       console.log(res);
-//       //connection.end();
-//       (err) => {
-//         if (err) throw err;
-//         console.log('Your task was successfull!');
-//         // re-prompt the user for if they want to query the database any further
-//         databaseAction();
-//       }
-//     });
-//   };
-
-//   databaseAction()
-//   viewAllEmployees();
-
-  //connect to the mysql server and sql database
-// connection.connect(err => {
-//     if (err) throw err;
-//     start()
-//   })
-// connection.end();
-
-
+//view all departements and add utilized department budget.
 const viewAllDepartments = () => {
-    let sql = `SELECT d.id, d.name "Department Name"
-                FROM department d;`
-
-    // let sql = `SELECT e.id, e.first_name, e.Last_name, r.title, d.name as "Department", salary
-    // FROM employee e
-    // LEFT JOIN role r 
-    // ON e.role_id = r.id 
-    // LEFT JOIN department d 
-    // ON r.department_id = d.id`
+    let sql = ` SELECT d.id, d.name "Department Name", sum(r.salary) as utilized_budget
+                FROM department d
+                LEFT JOIN role r 
+                ON r.department_id = d.id
+                LEFT JOIN employee e 
+                ON e.id = r.department_id
+                GROUP BY d.name;`
         connection.query(sql, (err, res) => {
         if (err) throw err;
         console.table(res);
-        // console.log(res);
-        //connection.end();
+        databaseAction();
+    });
+  };
+
+
+  const viewAllRoles = () => {
+    let sql =  `SELECT d.id, r.title, d.name AS "Department Name", r.salary
+                FROM role r
+                LEFT JOIN department d
+                ON r.department_id = d.id;`
+        connection.query(sql, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        databaseAction();
+      });
+  };
+
+
+// WHERE name='${d.name}'
+  const viewAllEmployeesByDepartment = () => {
+    let sql =  `SELECT d.id AS 'department_id', d.name "Department Name", e.first_name, e.last_name
+                FROM employee e
+                LEFT JOIN role r
+                ON e.role_id = r.id
+                LEFT JOIN department d 
+                ON d.id = r.department_id
+                GROUP BY department_id, d.name, e.first_name, e.last_name
+                ORDER BY d.name;`
+        connection.query(sql, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        databaseAction();
+      });
+  };
+
+  const viewAllEmployeesByManager = () => {
+    let sql =  `SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department,
+                r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
+                FROM employee e
+                LEFT JOIN employee AS m 
+                ON m.id = e.manager_id
+                LEFT JOIN role r 
+                ON e.role_id = r.id
+                LEFT JOIN department d 
+                ON r.department_id = d.id
+                GROUP BY manager;`
+        connection.query(sql, (err, res) => {
+        if (err) throw err;
+        console.table(res);
         databaseAction();
       });
   };
@@ -148,6 +164,7 @@ const addDepartment = () => {
                 if (err) throw err;
                 console.log(`${res.affectedRows} product inserted!\n`);
                 console.log("New department created successfully!");
+                viewAllDepartments();
                 databaseAction();
             }
         );
@@ -170,8 +187,7 @@ const addRole = () => {
         {
             name: "department_id",
             type: "input",
-            message: "Enter the department ID the role belongs to [Sales = 1, Engineering = 2, Finance = 3, Legal = 4]: ",
-            // addDepartment()
+            message: "Enter the department ID the role belongs to [1 for Sales, 2 for Engineering, 3 for Finance, 4 for Legal, 5 for Music]: ",
         },
     ])
     .then((answer) => {
@@ -191,7 +207,7 @@ const addRole = () => {
     );
   });
 }
-//   });
+
 
 
 //connect to the mysql server and sql database
