@@ -1,7 +1,7 @@
 let connection = require('./employeesDBConnection')
 // const mysql = require('mysql');
 const inquirer = require('inquirer');
-const { connectableObservableDescriptor } = require('rxjs/internal/observable/ConnectableObservable');
+//const { connectableObservableDescriptor } = require('rxjs/internal/observable/ConnectableObservable');
 
 //prompt the user for any of the possible actions they should take.
 const databaseAction = () => {
@@ -19,7 +19,8 @@ const databaseAction = () => {
                     "Add Employee", 
                     "Add Department",    
                     "Add Role", 
-                    "Update Employee Role",
+                    "Delete Role",
+                    "Delete Department",
                     "Exit",
             ],
         },
@@ -53,8 +54,11 @@ const databaseAction = () => {
             case "Add Role":
                 addRole();
             break;
-            case "Update Employee Role":
-                updateEmployeeRole();
+            case "Delete Role":
+                deleteRole();
+            break;
+            case "Delete Department":
+                deleteDepartment();
             break;
             default:
                 endConnection();
@@ -147,7 +151,7 @@ const viewAllDepartments = () => {
   };
 
 
-
+//add a department
 const addDepartment = () => {
         inquirer.prompt([
             {
@@ -258,8 +262,9 @@ const addEmployee = () => {
                         //if the choice matches one in the table, assign its role id to
                         //the role_id column for that new row inserted.
                         if (res[x].title == answer.role) {
+                            console.log("res[x].title = ", res[x].title)
                             role_id = res[x].id;
-                            //console.log(role_id)
+                            console.log("role_id = ", role_id)
                         }                  
                     }  
                     connection.query(
@@ -270,16 +275,130 @@ const addEmployee = () => {
                         manager_id: answer.manager_id,
                         role_id: role_id,
                     },
-                   (err) => {
+                    (err) => {
                         if (err) throw err;
                         //console.log("Employeee " + answer.last_name + " added!")
                         console.log(`\nEmployee ${answer.first_name} ${answer.last_name} added\n `);
                         databaseAction();
-                   })
+                    })
                     
                 })
         })
 };
+
+//delete role
+deleteRole = () => {
+    query = `SELECT * FROM role`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+
+        inquirer.prompt([
+            {
+                name: 'deleteRole',
+                type: 'list',
+                message: 'Select a role to delete:',
+                choices: () => {
+                    //declare empty array to store titles/roles
+                    let rolesArray = [];
+                    //store all roles in rolesArray array. the parameter res contains
+                    //the result of the SELECT * FROM role query, we loop through it
+                    //to get the title/role per row from it. we store the title/role
+                    //in the rolesArray array. this returns the different choices or roles
+                    //we see when we ask the question: What is this employee's role?
+                    for (let i = 0; i < res.length; i++) {
+                        rolesArray.push(res[i].title);
+                    }
+                    return rolesArray;
+                    //console.log("roleArrya title " + roleArray)
+                    },
+            }
+        ]).then((answer) => {
+
+            let role_id;
+            //loop through each of the rows.
+            for (let x = 0; x < res.length; x++) {
+                //if the choice matches one in the table, assign its role id to
+                //the role_id column for that new row inserted.
+                if (res[x].title == answer.role) {
+                    console.log("res[x].title = ", res[x].title)
+                    role_id = res[x].id;
+                    console.log("role_id = ", role_id)
+                }                  
+            }  
+
+            connection.query(`DELETE FROM role WHERE ? `, 
+            {
+                title: answer.deleteRole,
+            },
+           (err) => {
+                if (err) throw err;
+                //console.log("Employeee " + answer.last_name + " added!")
+                console.log(`\nRole ${answer.deleteRole} has been deleted\n `);
+                databaseAction();
+           })
+        })
+
+    })
+
+};
+
+
+//delete a department
+deleteDepartment = () => {
+    let sql = `SELECT * FROM department`;
+    connection.query(sql, (err, res) => {
+        if (err) throw err;
+
+        inquirer.prompt([
+            {
+                name: 'deleteDepartment',
+                type: 'list',
+                message: 'Select a department to delete:',
+                choices: () => {
+                    //declare empty array to store titles/roles
+                    let deparmentArray = [];
+                    //store all roles in rolesArray array. the parameter res contains
+                    //the result of the SELECT * FROM role query, we loop through it
+                    //to get the title/role per row from it. we store the title/role
+                    //in the rolesArray array. this returns the different choices or roles
+                    //we see when we ask the question: What is this employee's role?
+                    for (let i = 0; i < res.length; i++) {
+                        deparmentArray.push(res[i].name);
+                    }
+                    return deparmentArray;
+                    //console.log("roleArrya title " + roleArray)
+                    },
+            }
+        ]).then((answer) => {
+
+           // let id;
+            //loop through each of the rows.
+            for (let x = 0; x < res.length; x++) {
+                //if the choice matches one in the table, assign its role id to
+                //the role_id column for that new row inserted.
+                if (res[x].name == answer.name) {
+                    console.log("res[x].name = ", res[x].name)
+                   // id = res[x].id;
+                   // console.log("department id = ", id)
+                }                  
+            }  
+
+            connection.query(`DELETE FROM department WHERE ? `, 
+            {
+                name: answer.deleteDepartment,
+            },
+             (err) => {
+                  if (err) throw err;
+            //      //console.log("Employeee " + answer.last_name + " added!")
+            //     console.log(`\nRole ${answer.deleteDepartment} has been deleted\n `);
+                databaseAction()
+             })
+        })
+    })
+};
+
+
+
 
 // const updateEmployeeRole = () => {
 // connection.query(
