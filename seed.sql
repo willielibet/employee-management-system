@@ -24,4 +24,3 @@ INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Kunal',
 INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Malia', 'Brown', 6, 5);
 INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Sarah', 'Lourd', 5, NULL);
 INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Tom', 'Allen', 8, 7);
-INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Jackie', 'Chan', 1, NULL);

@@ -1,6 +1,7 @@
 let connection = require('./employeesDBConnection')
 // const mysql = require('mysql');
 const inquirer = require('inquirer');
+const { connectableObservableDescriptor } = require('rxjs/internal/observable/ConnectableObservable');
 
 //prompt the user for any of the possible actions they should take.
 const databaseAction = () => {
@@ -79,7 +80,8 @@ const databaseAction = () => {
       });
   };
 
-//view all departements and add utilized department budget.
+//view all departements and view the total utilized budget of a department.
+//the total utilized budget is the combined salaries of all employees in that department.
 const viewAllDepartments = () => {
     let sql = ` SELECT d.id, d.name "Department Name", sum(r.salary) as utilized_budget
                 FROM department d
@@ -208,7 +210,100 @@ const addRole = () => {
   });
 }
 
+// add an employee
+const addEmployee = () => {
+    //select everything from the role table.
+    //we do so to get the titles/roles and store them in an array. 
+    connection.query('SELECT * FROM role', (err,res) => {
+        inquirer.prompt([
+                {
+                    name: 'first_name',
+                    type: 'input', 
+                    message: "What is the employee's fist name? ",
+                },
+                {
+                    name: 'last_name',
+                    type: 'input', 
+                    message: "What is the employee's last name? "
+                },
+                {
+                    name: 'manager_id',
+                    type: 'input', 
+                    message: "What is the employee's manager's ID? "
+                },
+                {
+                    name: 'role', 
+                    type: 'list',
+                    message: "What is this employee's role? ",
+                    choices: () => {
+                    //declare empty array to store titles/roles
+                    let rolesArray = [];
+                    //store all roles in rolesArray array. the parameter res contains
+                    //the result of the SELECT * FROM role query, we loop through it
+                    //to get the title/role per row from it. we store the title/role
+                    //in the rolesArray array. this returns the different choices or roles
+                    //we see when we ask the question: What is this employee's role?
+                    for (let i = 0; i < res.length; i++) {
+                        rolesArray.push(res[i].title);
+                    }
+                    return rolesArray;
+                    //console.log("roleArrya title " + roleArray)
+                    },
+                    
+                }
+                ]).then( (answer) => {
+                    let role_id;
+                    //loop through each of the answers.
+                    for (let x = 0; x < res.length; x++) {
+                        //if the choice matches one in the table, assign its role id to
+                        //the role_id column for that new row inserted.
+                        if (res[x].title == answer.role) {
+                            role_id = res[x].id;
+                            //console.log(role_id)
+                        }                  
+                    }  
+                    connection.query(
+                    'INSERT INTO employee SET ?',
+                    {
+                        first_name: answer.first_name,
+                        last_name: answer.last_name,
+                        manager_id: answer.manager_id,
+                        role_id: role_id,
+                    },
+                   (err) => {
+                        if (err) throw err;
+                        //console.log("Employeee " + answer.last_name + " added!")
+                        console.log(`\nEmployee ${answer.first_name} ${answer.last_name} added\n `);
+                        databaseAction();
+                   })
+                    
+                })
+        })
+};
 
+// const updateEmployeeRole = () => {
+// connection.query(
+//     'UPDATE employee SET ? WHERE ?',
+//     [
+//       {
+//         role_id: role_id,
+//       },
+//       {
+//         id: chosenItem.id,
+//       },
+//     ],
+//     (error) => {
+//       if (error) throw err;
+//       console.log('Bid placed successfully!');
+//       start();
+//     }
+//   );
+
+//   // bid wasn't high enough, so apologize and start over
+//   console.log('Your bid was too low. Try again...');
+//   start();
+
+// };
 
 //connect to the mysql server and sql database
 connection.connect((err) => {
