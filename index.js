@@ -21,6 +21,7 @@ const databaseAction = () => {
                     "Add Role", 
                     "Delete Role",
                     "Delete Department",
+                    "Delete Employee",
                     "Exit",
             ],
         },
@@ -59,6 +60,9 @@ const databaseAction = () => {
             break;
             case "Delete Department":
                 deleteDepartment();
+            break;
+            case "Delete Employee":
+            deleteEmployee();
             break;
             default:
                 endConnection();
@@ -164,7 +168,7 @@ const addDepartment = () => {
             connection.query(
             'INSERT INTO department SET ?',
             {
-                name: answer.department,
+                first_name: answer.department,
             },
             (err, res) => {
                 if (err) throw err;
@@ -376,11 +380,11 @@ deleteDepartment = () => {
             for (let x = 0; x < res.length; x++) {
                 //if the choice matches one in the table, assign its role id to
                 //the role_id column for that new row inserted.
-                if (res[x].name == answer.name) {
-                    console.log("res[x].name = ", res[x].name)
+                //if (res[x].name == answer.name) {
+                 //   console.log("res[x].name = ", res[x].name)
                    // id = res[x].id;
                    // console.log("department id = ", id)
-                }                  
+                //}                  
             }  
 
             connection.query(`DELETE FROM department WHERE ? `, 
@@ -397,32 +401,60 @@ deleteDepartment = () => {
     })
 };
 
+//delete an employee
+deleteEmployee = () => {
+    let sql = `SELECT last_name FROM employee e`;
+    connection.query(sql, (err, res) => {
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                name: 'lastName',
+                type: 'list',
+                message: 'Employee\'s last name:',
+                choices: () => {
+                    //declare empty array to store titles/roles
+                    // let employeeArray = [];
+                    //store all roles in rolesArray array. the parameter res contains
+                    //the result of the SELECT * FROM role query, we loop through it
+                    //to get the title/role per row from it. we store the title/role
+                    //in the rolesArray array. this returns the different choices or roles
+                    //we see when we ask the question: What is this employee's role?
+                    let employeeArray = [];
+                    for (let i = 0; i < res.length; i++) {
+                        employeeArray.push(res[i].last_name);
+                    }
+                    return employeeArray;
+                    //console.log("roleArrya title " + roleArray)
+                    },
+            }
+        ]).then((answer) => {
 
+           //let id;
+            //loop through each of the rows.
+           //for (let x = 0; x < res.length; x++) {
+                //if the choice matches one in the table, assign its role id to
+                //the role_id column for that new row inserted.
+           //    if (res[x].EmployeeFullName == answer.employeeFullName) {
+               //     console.log("res[x].first_name = ", res[x].first_name)
+                  //  id = res[x].id;
+                   // console.log("department id = ", id)
+            //   }                  
+        // }  
 
+            connection.query(`DELETE FROM employee WHERE ? `, 
+            {
+               last_name: answer.lastName,
+            },
+             (err) => {
+                  if (err) throw err;
+            //      //console.log("Employeee " + answer.last_name + " added!")
+                console.log(`\nEmployee ${answer.lastName} has been deleted\n `);
+                databaseAction();
+             })
+        })
+    })
+};
 
-// const updateEmployeeRole = () => {
-// connection.query(
-//     'UPDATE employee SET ? WHERE ?',
-//     [
-//       {
-//         role_id: role_id,
-//       },
-//       {
-//         id: chosenItem.id,
-//       },
-//     ],
-//     (error) => {
-//       if (error) throw err;
-//       console.log('Bid placed successfully!');
-//       start();
-//     }
-//   );
-
-//   // bid wasn't high enough, so apologize and start over
-//   console.log('Your bid was too low. Try again...');
-//   start();
-
-// };
 
 //connect to the mysql server and sql database
 connection.connect((err) => {
