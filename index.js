@@ -319,9 +319,9 @@ deleteRole = () => {
                 //if the choice matches one in the table, assign its role id to
                 //the role_id column for that new row inserted.
                 if (res[x].title == answer.role) {
-                    console.log("res[x].title = ", res[x].title)
+                   //console.log("res[x].title = ", res[x].title)
                     role_id = res[x].id;
-                    console.log("role_id = ", role_id)
+                    //console.log("role_id = ", role_id)
                 }                  
             }  
 
