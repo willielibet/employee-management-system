@@ -1,7 +1,6 @@
 let connection = require('./employeesDBConnection')
 // const mysql = require('mysql');
 const inquirer = require('inquirer');
-//const { connectableObservableDescriptor } = require('rxjs/internal/observable/ConnectableObservable');
 
 //prompt the user for any of the possible actions they should take.
 const databaseAction = () => {
@@ -11,11 +10,10 @@ const databaseAction = () => {
           name: "dbAction",
           message: "What would you like to do?",
           choices: ["View All Employees", 
-                    "View All Employees by Department", 
-                    "View All Employees by Role",
-                    "View All Employees by Manager",
                     "View All Departments", 
                     "View All Roles",
+                    "View All Employees by Department", 
+                    "View All Employees by Manager",
                     "Add Employee", 
                     "Add Department",    
                     "Add Role", 
@@ -36,9 +34,6 @@ const databaseAction = () => {
             break;
             case "View All Employees by Department":
                 viewAllEmployeesByDepartment();
-            break;
-            case "View All Employees by Role":
-                viewAllEmployeesByRole();
             break;
             case "View All Departments":
                 viewAllDepartments();
@@ -62,7 +57,7 @@ const databaseAction = () => {
                 deleteDepartment();
             break;
             case "Delete Employee":
-            deleteEmployee();
+                deleteEmployee();
             break;
             default:
                 endConnection();
@@ -168,7 +163,7 @@ const addDepartment = () => {
             connection.query(
             'INSERT INTO department SET ?',
             {
-                first_name: answer.department,
+                name: answer.department,
             },
             (err, res) => {
                 if (err) throw err;
@@ -181,7 +176,7 @@ const addDepartment = () => {
       });
 }
 
-
+//add a role
 const addRole = () => {
     inquirer.prompt([
         {
@@ -261,7 +256,7 @@ const addEmployee = () => {
                 }
                 ]).then( (answer) => {
                     let role_id;
-                    //loop through each of the answers.
+                    //loop through each row in the role table.
                     for (let x = 0; x < res.length; x++) {
                         //if the choice matches one in the table, assign its role id to
                         //the role_id column for that new row inserted.
